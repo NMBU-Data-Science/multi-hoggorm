@@ -90,7 +90,7 @@ def nanpca_(X, ncomp='max', center=True, tol=10e-12, max_iter=200, sing_vals=Fal
         Z_pred = scores@loadings.T + Z_means
         err = sum((Z[the_nans]-Z_pred[the_nans])**2)
         Z[the_nans] = Z_pred[the_nans]
-        
+
     if sing_vals:
         scores, loadings, singulars = pca_(Z, ncomp=ncomp, sing_vals=True)
         return (scores, loadings, singulars, (iters, err, Z))
@@ -123,10 +123,10 @@ def pcacv_(X, ncomp='max', center=True):
     Xhat = np.zeros((n_samples, n_features, ncomp))
 
     # Cross-validation (leave-one-out)
-    for i in tqdm(range(n_samples), leave=True):
+    for i in range(n_samples):
         Xi = np.delete(X, i, 0)
 
-        # sklearn truncated svd --> Pi is different, but same end result
+        # sklearn truncated svd --> supposedly a wrapper for scipy.sparse.linalg.svds ?
         svd = TruncatedSVD(ncomp)
         svd.fit(Xi)
         Pi = np.transpose(svd.components_)
@@ -135,7 +135,7 @@ def pcacv_(X, ncomp='max', center=True):
         # u, s, vh = svds(Xi, ncomp, return_singular_vectors="vh")
         # Pi = np.transpose(vh)
 
-        # old approach: complete SVD, not truncated --> calculates all components
+        # old approach: complete SVD, not truncated --> calculates all components; implement branching paths?
         # u, s, vh = nplin.svd(Xi, full_matrices=False, compute_uv=True)
         # Pi = np.transpose(vh)
 
@@ -161,10 +161,11 @@ def pcacv_(X, ncomp='max', center=True):
     return error
 
 
-X = np.array([[1, 2, 3, 4, 5], [2, 1, 3, 3, 7], [3, 5, 5, 1, 8], [6, 7, 2, 3, 5], [9, 4, 7, 1, 6]], dtype='float64')
-#scores, loadings = pca_(X)
-result = pcacv_(X)
-print(str(result))
+# X = np.array([[1, 2, 3, 4, 5], [2, 1, 3, 3, 7], [3, 5, 5, 1, 8], [6, 7, 2, 3, 5], [9, 4, 7, 1, 6]], dtype='float64')
+# scores, loadings = pca_(X)
+# result = pcacv_(X, 2)
+# print("\nResult")
+# print(str(result))
 
 
 #X1 = np.array([[1, 2, 3, 4], [2, 1, 3, 3], [3, 5, 5, 1]], dtype='float64')
